@@ -93,7 +93,7 @@ blogPostSchema.pre('save', async function (next) {
     this.slug = slugify(this.title, {
       lower: true,
       strict: true,
-      remove: /[*+~.()'\"!:@]/g,
+      remove: /[*+~.()'"!:@]/g,
     });
   }
 
