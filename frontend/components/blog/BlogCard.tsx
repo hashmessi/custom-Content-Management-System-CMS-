@@ -11,7 +11,7 @@ interface BlogPost {
   featuredImage?: string;
   publishedAt?: string;
   readingTime?: number;
-  viewCount: number;
+  viewCount?: number;
   author?: {
     name: string;
     avatar?: string;
