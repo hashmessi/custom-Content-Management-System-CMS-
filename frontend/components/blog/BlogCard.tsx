@@ -9,7 +9,7 @@ interface BlogPost {
   slug: string;
   excerpt: string;
   featuredImage?: string;
-  publishedAt: string;
+  publishedAt?: string;
   readingTime?: number;
   viewCount: number;
   author?: {
