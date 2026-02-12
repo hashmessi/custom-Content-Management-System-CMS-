@@ -1,5 +1,7 @@
+'use client';
+
 import Link from 'next/link';
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { ArrowUpRight, Clock, Eye } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { BlogPost } from '@/lib/types';
@@ -10,6 +12,12 @@ interface BlogCardProps {
 }
 
 const BlogCard = ({ post, index }: BlogCardProps) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Draft';
+    const date = new Date(dateString);
+    return isValid(date) ? format(date, 'MMM d, yyyy') : 'Invalid Date';
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -37,7 +45,7 @@ const BlogCard = ({ post, index }: BlogCardProps) => {
       <div className="p-6 flex flex-col grow">
         <div className="flex items-center gap-4 text-xs text-gray-500 mb-4 font-medium">
           <time dateTime={post.publishedAt}>
-            {post.publishedAt ? format(new Date(post.publishedAt), 'MMM d, yyyy') : 'Draft'}
+            {formatDate(post.publishedAt)}
           </time>
           <span className="w-1 h-1 bg-gray-300 rounded-full" />
           <span className="flex items-center gap-1">
