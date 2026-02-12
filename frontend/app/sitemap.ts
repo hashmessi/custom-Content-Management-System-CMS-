@@ -1,10 +1,6 @@
 import { MetadataRoute } from 'next';
+import { BlogPost } from '@/lib/types';
 
-interface BlogSitemapPost {
-  slug: string;
-  publishedAt?: string;
-  updatedAt?: string;
-}
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
@@ -48,9 +44,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   // Dynamic blog post routes
-  const blogRoutes: MetadataRoute.Sitemap = blogs.map((post: BlogSitemapPost) => ({
+  const blogRoutes: MetadataRoute.Sitemap = blogs.map((post: BlogPost) => ({
     url: `${SITE_URL}/blog/${post.slug}`,
-    lastModified: new Date(post.publishedAt || post.updatedAt),
+    lastModified: post.publishedAt || post.updatedAt ? new Date(post.publishedAt || post.updatedAt!) : new Date(),
     changeFrequency: 'weekly' as const,
     priority: 0.6,
   }));

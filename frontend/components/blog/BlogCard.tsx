@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { ArrowUpRight, Clock, Eye } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { BlogPost } from '@/components/admin/BlogListTable';
+import { BlogPost } from '@/lib/types';
 
 interface BlogCardProps {
   post: BlogPost;
@@ -34,7 +34,7 @@ const BlogCard = ({ post, index }: BlogCardProps) => {
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
       </Link>
       
-      <div className="p-6 flex flex-col flex-grow">
+      <div className="p-6 flex flex-col grow">
         <div className="flex items-center gap-4 text-xs text-gray-500 mb-4 font-medium">
           <time dateTime={post.publishedAt}>
             {post.publishedAt ? format(new Date(post.publishedAt), 'MMM d, yyyy') : 'Draft'}
@@ -57,7 +57,7 @@ const BlogCard = ({ post, index }: BlogCardProps) => {
           </h3>
         </Link>
         
-        <p className="text-gray-600 text-sm line-clamp-3 mb-6 flex-grow leading-relaxed">
+        <p className="text-gray-600 text-sm line-clamp-3 mb-6 grow leading-relaxed">
           {post.excerpt}
         </p>
         

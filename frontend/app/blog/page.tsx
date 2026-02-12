@@ -3,7 +3,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import BlogCard from '@/components/blog/BlogCard';
 import { getBlogPosts } from '@/lib/api';
-import { BlogPost } from '@/components/admin/BlogListTable';
+import { BlogPost } from '@/lib/types';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 

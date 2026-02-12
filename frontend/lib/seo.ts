@@ -1,19 +1,6 @@
 // SEO utility functions for generating structured data (JSON-LD)
+import { BlogPost } from './types';
 
-export interface BlogPost {
-  _id: string;
-  title: string;
-  slug: string;
-  excerpt: string;
-  content: string;
-  featuredImage?: string;
-  publishedAt: string;
-  metaTitle?: string;
-  metaDescription?: string;
-  author?: {
-    name: string;
-  };
-}
 
 /**
  * Generate Organization schema for homepage

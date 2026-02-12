@@ -7,18 +7,8 @@ import Image from 'next/image';
 import { Edit, Eye } from 'lucide-react';
 import { DeleteBlogButton } from '@/components/admin/BlogActions';
 import { format } from 'date-fns';
+import { BlogPost } from '@/lib/types';
 
-export interface BlogPost {
-  _id: string;
-  title: string;
-  excerpt: string;
-  featuredImage?: string;
-  status: string;
-  publishedAt?: string;
-  slug: string;
-  viewCount?: number;
-  readingTime?: number;
-}
 
 interface BlogListTableProps {
   posts: BlogPost[];
