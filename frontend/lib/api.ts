@@ -1,4 +1,16 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+// Helper to ensure API URL always has the correct suffix
+const getApiUrl = () => {
+  const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+  // Remove trailing slash if present
+  const cleanUrl = url.replace(/\/$/, '');
+  // Append /api/v1 if not present
+  if (!cleanUrl.endsWith('/api/v1')) {
+    return `${cleanUrl}/api/v1`;
+  }
+  return cleanUrl;
+};
+
+export const API_URL = getApiUrl();
 
 export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
   const res = await fetch(`${API_URL}${endpoint}`, {
