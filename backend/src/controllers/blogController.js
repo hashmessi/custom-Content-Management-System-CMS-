@@ -1,6 +1,8 @@
 const BlogPost = require('../models/BlogPost');
 const asyncHandler = require('../middleware/asyncHandler');
 const { generateSlug, ensureUniqueSlug } = require('../utils/slugGenerator');
+const sharp = require('sharp');
+const cloudinary = require('../config/cloudinary');
 
 /**
  * @desc    Create new blog post
@@ -8,6 +10,33 @@ const { generateSlug, ensureUniqueSlug } = require('../utils/slugGenerator');
  * @access  Private
  */
 exports.createBlogPost = asyncHandler(async (req, res) => {
+  // Handle image upload if file exists
+  if (req.file) {
+    let buffer = req.file.buffer;
+    
+    // Optimize image
+    if (req.file.mimetype.startsWith('image/')) {
+        buffer = await sharp(buffer)
+          .resize(1920, 1080, { fit: 'inside', withoutEnlargement: true })
+          .jpeg({ quality: 85 })
+          .toBuffer();
+    }
+
+    // Upload to Cloudinary
+    const result = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          { folder: 'antigravity-cms/blogs', resource_type: 'image' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        uploadStream.end(buffer);
+    });
+
+    req.body.featuredImage = result.secure_url;
+  }
+
   // Auto-generate slug from title if not provided
   if (!req.body.slug && req.body.title) {
     const baseSlug = generateSlug(req.body.title);
@@ -140,6 +169,33 @@ exports.updateBlogPost = asyncHandler(async (req, res) => {
       success: false,
       error: 'Blog post not found',
     });
+  }
+
+  // Handle image upload if file exists
+  if (req.file) {
+    let buffer = req.file.buffer;
+    
+    // Optimize image
+    if (req.file.mimetype.startsWith('image/')) {
+        buffer = await sharp(buffer)
+          .resize(1920, 1080, { fit: 'inside', withoutEnlargement: true })
+          .jpeg({ quality: 85 })
+          .toBuffer();
+    }
+
+    // Upload to Cloudinary
+    const result = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          { folder: 'antigravity-cms/blogs', resource_type: 'image' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        uploadStream.end(buffer);
+    });
+
+    req.body.featuredImage = result.secure_url;
   }
 
   // If slug is being updated, ensure uniqueness

@@ -12,28 +12,19 @@ const {
   unpublishBlogPost,
   searchBlogPosts,
 } = require('../controllers/blogController');
-const validate = require('../middleware/validator');
-const {
-  createBlogPostSchema,
-  updateBlogPostSchema,
-  searchBlogSchema,
-} = require('../validators/blog.validator');
+const upload = require('../middleware/upload');
 
-// Public routes
-router.get('/published', getPublishedBlogPosts);
-router.get('/slug/:slug', getBlogBySlug);
-router.post('/search', validate(searchBlogSchema), searchBlogPosts);
+// ... (keep intervening code)
 
-// Routes with validation
 router
   .route('/')
   .get(getBlogPosts)
-  .post(validate(createBlogPostSchema), createBlogPost);
+  .post(upload.single('image'), validate(createBlogPostSchema), createBlogPost);
 
 router
   .route('/:id')
   .get(getBlogPost)
-  .put(validate(updateBlogPostSchema), updateBlogPost)
+  .put(upload.single('image'), validate(updateBlogPostSchema), updateBlogPost)
   .delete(deleteBlogPost);
 
 router.patch('/:id/publish', publishBlogPost);
