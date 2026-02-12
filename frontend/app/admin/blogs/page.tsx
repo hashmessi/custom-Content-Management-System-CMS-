@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import { getAllBlogPosts } from '@/lib/api';
-import BlogListTable, { BlogPost } from '@/components/admin/BlogListTable';
+import BlogListTable from '@/components/admin/BlogListTable';
+import { BlogPost } from '@/lib/types';
 import BlogSearch from '@/components/admin/BlogSearch';
 
 export const dynamic = 'force-dynamic';

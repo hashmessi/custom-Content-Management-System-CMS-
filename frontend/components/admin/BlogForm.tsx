@@ -22,17 +22,12 @@ interface BlogFormData {
   metaDescription: string;
 }
 
+import { BlogPost } from '@/lib/types';
+
+// ... (keep intervening code)
+
 interface BlogFormProps {
-  initialData?: {
-    _id?: string;
-    title?: string;
-    excerpt?: string;
-    content?: string;
-    status?: 'draft' | 'published';
-    metaTitle?: string;
-    metaDescription?: string;
-    featuredImage?: string;
-  };
+  initialData?: Partial<BlogPost>;
   isEdit?: boolean;
 }
 
