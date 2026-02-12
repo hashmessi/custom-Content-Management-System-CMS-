@@ -16,6 +16,8 @@ export interface BlogPost {
   status: string;
   publishedAt?: string;
   slug: string;
+  viewCount?: number;
+  readingTime?: number;
 }
 
 interface BlogListTableProps {
