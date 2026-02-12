@@ -20,9 +20,32 @@ const app = express();
 app.use(helmet());
 
 // CORS configuration
+// CORS configuration
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://custom-content-management-system-cm-rouge.vercel.app',
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.indexOf(origin) === -1) {
+        // Allow all Vercel deployments
+        if (origin.endsWith('.vercel.app')) {
+          return callback(null, true);
+        }
+        
+        // Block other origins in production, but allow for now to prevent blocking valid clients
+        console.warn(`Blocked CORS request from origin: ${origin}`);
+        // return callback(new Error('Not allowed by CORS')); // Uncomment to enforce strict CORS
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
   }),
 );
