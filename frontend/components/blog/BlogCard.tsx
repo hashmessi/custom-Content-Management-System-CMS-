@@ -2,21 +2,7 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { ArrowUpRight, Clock, Eye } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-interface BlogPost {
-  _id: string;
-  title: string;
-  slug: string;
-  excerpt: string;
-  featuredImage?: string;
-  publishedAt?: string;
-  readingTime?: number;
-  viewCount?: number;
-  author?: {
-    name: string;
-    avatar?: string;
-  };
-}
+import { BlogPost } from '@/components/admin/BlogListTable';
 
 interface BlogCardProps {
   post: BlogPost;
