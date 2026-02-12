@@ -3,6 +3,7 @@ const asyncHandler = require('../middleware/asyncHandler');
 const { generateSlug, ensureUniqueSlug } = require('../utils/slugGenerator');
 const sharp = require('sharp');
 const cloudinary = require('../config/cloudinary');
+const sanitizeHtml = require('sanitize-html');
 
 /**
  * @desc    Create new blog post
@@ -10,6 +11,34 @@ const cloudinary = require('../config/cloudinary');
  * @access  Private
  */
 exports.createBlogPost = asyncHandler(async (req, res) => {
+  // Validate required fields
+  if (!req.body.title || !req.body.title.trim()) {
+    return res.status(400).json({
+      success: false,
+      error: 'Title is required',
+    });
+  }
+
+  if (!req.body.content || !req.body.content.trim()) {
+    return res.status(400).json({
+      success: false,
+      error: 'Content is required',
+    });
+  }
+
+  // Sanitize content to prevent XSS attacks
+  if (req.body.content) {
+    req.body.content = sanitizeHtml(req.body.content, {
+      allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']),
+      allowedAttributes: {
+        ...sanitizeHtml.defaults.allowedAttributes,
+        a: ['href', 'title', 'target'],
+        img: ['src', 'alt', 'width', 'height', 'loading'],
+      },
+      allowedSchemes: ['http', 'https'],
+    });
+  }
+
   // Handle image upload if file exists
   if (req.file) {
     let buffer = req.file.buffer;
@@ -43,12 +72,22 @@ exports.createBlogPost = asyncHandler(async (req, res) => {
     req.body.slug = await ensureUniqueSlug(baseSlug, BlogPost);
   }
 
-  const blogPost = await BlogPost.create(req.body);
+  try {
+    const blogPost = await BlogPost.create(req.body);
 
-  res.status(201).json({
-    success: true,
-    data: blogPost,
-  });
+    res.status(201).json({
+      success: true,
+      data: blogPost,
+    });
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        error: 'Slug already exists. Please use a different slug.',
+      });
+    }
+    throw err;
+  }
 });
 
 /**
@@ -198,20 +237,43 @@ exports.updateBlogPost = asyncHandler(async (req, res) => {
     req.body.featuredImage = result.secure_url;
   }
 
+  // Sanitize content if being updated
+  if (req.body.content) {
+    req.body.content = sanitizeHtml(req.body.content, {
+      allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']),
+      allowedAttributes: {
+        ...sanitizeHtml.defaults.allowedAttributes,
+        a: ['href', 'title', 'target'],
+        img: ['src', 'alt', 'width', 'height', 'loading'],
+      },
+      allowedSchemes: ['http', 'https'],
+    });
+  }
+
   // If slug is being updated, ensure uniqueness
   if (req.body.slug && req.body.slug !== blogPost.slug) {
     req.body.slug = await ensureUniqueSlug(req.body.slug, BlogPost, req.params.id);
   }
 
-  blogPost = await BlogPost.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
+  try {
+    blogPost = await BlogPost.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
-  res.status(200).json({
-    success: true,
-    data: blogPost,
-  });
+    res.status(200).json({
+      success: true,
+      data: blogPost,
+    });
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        error: 'Slug already exists. Please use a different slug.',
+      });
+    }
+    throw err;
+  }
 });
 
 /**

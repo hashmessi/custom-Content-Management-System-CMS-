@@ -9,6 +9,8 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { generateBlogPostingSchema, renderJsonLd } from '@/lib/seo';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const post = await getBlogPostBySlug(params.slug);
   if (!post) return { title: 'Post Not Found' };
@@ -51,7 +53,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
   const post = await getBlogPostBySlug(params.slug);
 
-  if (!post) {
+  if (!post || post.status !== 'published') {
     notFound();
   }
 
@@ -116,7 +118,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             <article className="lg:w-2/3">
               <div 
                 className="prose prose-lg prose-blue max-w-none prose-headings:font-outfit prose-img:rounded-xl"
-                dangerouslySetInnerHTML={{ __html: post.content }}
+                dangerouslySetInnerHTML={{ __html: post?.content || '<p>Content not available</p>' }}
               />
               
               <div className="mt-12 pt-8 border-t border-gray-200">

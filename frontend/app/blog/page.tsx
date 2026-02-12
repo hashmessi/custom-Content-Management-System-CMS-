@@ -9,6 +9,8 @@ import Link from 'next/link';
 
 import { Metadata } from 'next';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Insights',
   description: 'Latest updates, insights, and thought leadership from Giakaa on digital transformation and enterprise solutions.',
@@ -34,7 +36,9 @@ export default async function BlogPage(props: {
   const searchParams = await props.searchParams;
   const page = Number(searchParams?.page) || 1;
   const limit = 9;
-  const { data: posts, pages: totalPages } = await getBlogPosts(page, limit);
+  const response = await getBlogPosts(page, limit);
+  const posts = response?.data || [];
+  const totalPages = response?.pages || 0;
 
   return (
     <main className="min-h-screen bg-gray-50">

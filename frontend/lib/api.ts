@@ -13,29 +13,39 @@ const getApiUrl = () => {
 export const API_URL = getApiUrl();
 
 export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
-  const res = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
+  try {
+    const res = await fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    });
 
-  if (!res.ok) {
-    // Handle error (you might want to throw or return null)
-    console.error(`API Error: ${res.statusText}`);
-    const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.error || 'API request failed');
+    if (!res.ok) {
+      console.error(`API Error: ${res.status} ${res.statusText}`);
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.error || `API request failed with status ${res.status}`);
+    }
+
+    const json = await res.json();
+    
+    // Validate response structure
+    if (!json || typeof json !== 'object') {
+      throw new Error('Invalid API response format');
+    }
+
+    return json;
+  } catch (error) {
+    console.error(`API call failed for ${endpoint}:`, error);
+    throw error;
   }
-
-  const json = await res.json();
-  return json;
 }
 
 // Blog specific fetchers
 export async function getPublishedBlogPosts(page = 1, limit = 9) {
   try {
-    return await fetchAPI(`/blogs/published?page=${page}&limit=${limit}`, { cache: 'no-store' });
+    return await fetchAPI(`/blogs/published?page=${page}&limit=${limit}`, { next: { revalidate: 60 } });
   } catch (error) {
     console.error('Failed to fetch blogs:', error);
     return { data: [], pages: 0, total: 0 };
@@ -44,7 +54,7 @@ export async function getPublishedBlogPosts(page = 1, limit = 9) {
 
 export async function getAllBlogPosts(page = 1, limit = 10) {
   try {
-    return await fetchAPI(`/blogs?page=${page}&limit=${limit}`, { cache: 'no-store' });
+    return await fetchAPI(`/blogs?page=${page}&limit=${limit}`, { next: { revalidate: 60 } });
   } catch (error) {
     console.error('Failed to fetch all blogs:', error);
     return { data: [], pages: 0, total: 0 };
