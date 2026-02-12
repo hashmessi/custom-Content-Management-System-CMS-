@@ -12,10 +12,20 @@ const {
   unpublishBlogPost,
   searchBlogPosts,
 } = require('../controllers/blogController');
+const validate = require('../middleware/validator');
+const {
+  createBlogPostSchema,
+  updateBlogPostSchema,
+  searchBlogSchema,
+} = require('../validators/blog.validator');
 const upload = require('../middleware/upload');
 
-// ... (keep intervening code)
+// Public routes
+router.get('/published', getPublishedBlogPosts);
+router.get('/slug/:slug', getBlogBySlug);
+router.post('/search', validate(searchBlogSchema), searchBlogPosts);
 
+// Routes with validation
 router
   .route('/')
   .get(getBlogPosts)
