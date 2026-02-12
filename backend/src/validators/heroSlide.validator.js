@@ -6,8 +6,9 @@ const createHeroSlideSchema = Joi.object({
     'string.empty': 'Title is required',
     'string.max': 'Title cannot exceed 255 characters',
   }),
+  subtitle: Joi.string().allow('').trim(),
   description: Joi.string().allow('').trim(),
-  mediaUrl: Joi.string().uri().allow('').trim(),
+  mediaUrl: Joi.string().allow('').trim(),
   mediaType: Joi.string().valid('image', 'video').default('image'),
   ctaText: Joi.string().max(100).allow('').trim(),
   ctaLink: Joi.string().allow('').trim(),
@@ -18,8 +19,9 @@ const createHeroSlideSchema = Joi.object({
 // Update hero slide validation
 const updateHeroSlideSchema = Joi.object({
   title: Joi.string().max(255).trim(),
+  subtitle: Joi.string().allow('').trim(),
   description: Joi.string().allow('').trim(),
-  mediaUrl: Joi.string().uri().allow('').trim(),
+  mediaUrl: Joi.string().allow('').trim(),
   mediaType: Joi.string().valid('image', 'video'),
   ctaText: Joi.string().max(100).allow('').trim(),
   ctaLink: Joi.string().allow('').trim(),

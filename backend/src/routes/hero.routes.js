@@ -16,6 +16,7 @@ const {
   updateHeroSlideSchema,
   reorderSchema,
 } = require('../validators/heroSlide.validator');
+const upload = require('../middleware/upload');
 
 // Public routes
 router.get('/active', getActiveHeroSlides);
@@ -24,12 +25,12 @@ router.get('/active', getActiveHeroSlides);
 router
   .route('/')
   .get(getHeroSlides)
-  .post(validate(createHeroSlideSchema), createHeroSlide);
+  .post(upload.single('image'), validate(createHeroSlideSchema), createHeroSlide);
 
 router
   .route('/:id')
   .get(getHeroSlide)
-  .put(validate(updateHeroSlideSchema), updateHeroSlide)
+  .put(upload.single('image'), validate(updateHeroSlideSchema), updateHeroSlide)
   .delete(deleteHeroSlide);
 
 router.patch('/:id/reorder', validate(reorderSchema), reorderHeroSlide);

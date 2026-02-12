@@ -1,5 +1,7 @@
 const HeroSlide = require('../models/HeroSlide');
 const asyncHandler = require('../middleware/asyncHandler');
+const sharp = require('sharp');
+const cloudinary = require('../config/cloudinary');
 
 /**
  * @desc    Create new hero slide
@@ -7,6 +9,39 @@ const asyncHandler = require('../middleware/asyncHandler');
  * @access  Private
  */
 exports.createHeroSlide = asyncHandler(async (req, res) => {
+  // Map subtitle to description if present
+  if (req.body.subtitle) {
+    req.body.description = req.body.subtitle;
+  }
+
+  // Handle image upload if file exists
+  if (req.file) {
+    let buffer = req.file.buffer;
+    
+    // Optimize image
+    if (req.file.mimetype.startsWith('image/')) {
+        buffer = await sharp(buffer)
+          .resize(1920, 1080, { fit: 'inside', withoutEnlargement: true })
+          .jpeg({ quality: 85 })
+          .toBuffer();
+    }
+
+    // Upload to Cloudinary
+    const result = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          { folder: 'antigravity-cms/hero', resource_type: 'image' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        uploadStream.end(buffer);
+    });
+
+    req.body.mediaUrl = result.secure_url;
+    req.body.mediaType = 'image';
+  }
+
   const heroSlide = await HeroSlide.create(req.body);
 
   res.status(201).json({
@@ -94,6 +129,39 @@ exports.updateHeroSlide = asyncHandler(async (req, res) => {
       success: false,
       error: 'Hero slide not found',
     });
+  }
+
+  // Map subtitle to description if present
+  if (req.body.subtitle) {
+    req.body.description = req.body.subtitle;
+  }
+
+  // Handle image upload if file exists
+  if (req.file) {
+    let buffer = req.file.buffer;
+    
+    // Optimize image
+    if (req.file.mimetype.startsWith('image/')) {
+        buffer = await sharp(buffer)
+          .resize(1920, 1080, { fit: 'inside', withoutEnlargement: true })
+          .jpeg({ quality: 85 })
+          .toBuffer();
+    }
+
+    // Upload to Cloudinary
+    const result = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          { folder: 'antigravity-cms/hero', resource_type: 'image' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        uploadStream.end(buffer);
+    });
+
+    req.body.mediaUrl = result.secure_url;
+    req.body.mediaType = 'image';
   }
 
   heroSlide = await HeroSlide.findByIdAndUpdate(req.params.id, req.body, {
