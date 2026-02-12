@@ -28,12 +28,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function BlogPage({
-  searchParams,
-}: {
-  searchParams: { page?: string };
+export default async function BlogPage(props: {
+  searchParams: Promise<{ page?: string }>;
 }) {
-  const page = Number(searchParams.page) || 1;
+  const searchParams = await props.searchParams;
+  const page = Number(searchParams?.page) || 1;
   const limit = 9;
   const { data: posts, pages: totalPages } = await getBlogPosts(page, limit);
 
